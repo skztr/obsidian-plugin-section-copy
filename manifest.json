@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-plugin-base",
-	"name": "Base Plugin",
+	"id": "obsidian-plugin-copy-section",
+	"name": "Copy Section Plugin",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "",

@@ -1,8 +1,29 @@
-/*
+.plugin-copy-section-buttons {
+    background: var(--background-secondary);
+    border-radius: var(--tag-radius);
+    display: inline-flex;
+    font-size: var(--font-ui-smaller);
+    line-height: 1;
+    margin: calc(-1 * var(--size-2-3)) 0 calc(-1 * var(--size-2-3)) var(--size-4-2);
+    padding: var(--size-2-3) var(--size-4-2);
+    position: relative;
+    --icon-size: var(--icon-xs);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.plugin-copy-section-button {
+    pointer-events: visible;
+    cursor: default;
+    opacity: var(--icon-opacity);
+}
 
-If your plugin does not need CSS, delete this file.
+.HyperMD-header .plugin-copy-section-buttons {
+    visibility: hidden;
+}
 
-*/
+.HyperMD-header:hover .plugin-copy-section-buttons {
+    visibility: visible;
+}
+
+.HyperMD-header:hover .plugin-copy-section-button:hover {
+    opacity: var(--icon-opacity-hover);
+}
