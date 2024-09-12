@@ -11,11 +11,22 @@ export interface TextLine {
   text: string;
 }
 
-// TextLines attempts to allow efficient iteration over lines in a potentially very large document
+export interface TextLines extends Iterable<TextLine> {
+  // Array-like access to get(index: number)
+  [index: number]: TextLine | undefined;
+  [Symbol.iterator](): Iterator<TextLine>;
+  slice(start?: number, end?: number): TextLines;
+}
+
+// BlobTextLines attempts to allow efficient iteration over lines in a potentially very large document
 // it caches the offset positions of each line, but does not duplicate the memory of the document itself
 // (other than "one line at a time")
 // It is returned as a Proxy to itself when initialized, allowing for array-like access.
-export class TextLines implements Iterable<TextLine> {
+export class BlobTextLines implements Iterable<TextLine>, TextLines {
+  protected _blob: string;
+  protected _offset: number;
+  protected _startLine: number;
+  protected _endLine?: number;
   protected _offsetCache: number[] = [0];
   protected _offsetCacheFull: boolean = false;
   protected static _proxyHandler = {
@@ -34,10 +45,16 @@ export class TextLines implements Iterable<TextLine> {
     },
   };
   constructor(
-    protected _blob: string,
-    protected _offset: number = 0,
+    protected blob: string,
+    protected offset?: number,
+    protected startLine?: number,
+    protected endLine?: number,
   ) {
-    return new Proxy(this, TextLines._proxyHandler);
+    this._blob = blob;
+    this._offset = offset || 0;
+    this._startLine = startLine || 0;
+    this._endLine = endLine;
+    return new Proxy(this, BlobTextLines._proxyHandler);
   }
   public get firstLine(): TextLine | undefined {
     return this.get(0);
@@ -95,23 +112,43 @@ export class TextLines implements Iterable<TextLine> {
     };
   }
 
+  public slice(start?: number, end?: number): BlobTextLines {
+    const sliced = new BlobTextLines(
+      this._blob,
+      this._offset,
+      this._startLine + (start || 0),
+      end === undefined && this._endLine === undefined
+        ? undefined
+        : end === undefined && this._endLine !== undefined
+          ? this._endLine
+          : end !== undefined && this._endLine === undefined
+            ? end + this._startLine
+            : Math.min(
+                (end as number) + this._startLine,
+                this._endLine as number,
+              ),
+    );
+    sliced._offsetCache = this._offsetCache;
+    sliced._offsetCacheFull = this._offsetCacheFull;
+    return sliced;
+  }
+
   // A method that returns the default iterator for an object. Called by the semantics of the for-of statement.
   // startingLine: optional 0-based line number to start iterating from
-  public [Symbol.iterator](startingLine: number = 0): Iterator<TextLine> {
-    if (startingLine && !this._offsetCacheFull) {
-      this.get(startingLine); /* fill the cache */
-    }
-    let offset = this._offsetCache[startingLine || 0];
-    if (!this._blob || offset === undefined) {
+  public [Symbol.iterator](): Iterator<TextLine> {
+    if (!this._blob) {
       return [].values();
     }
 
     const self = this;
-    let i = startingLine;
-    return {
+    let i = 0;
+    let offset = 0;
+    const nexter = {
       next(): IteratorResult<TextLine> {
-        if (offset === -1) {
-          self._offsetCacheFull = true;
+        if (offset === -1 || i === self._endLine) {
+          if (offset === -1) {
+            self._offsetCacheFull = true;
+          }
           return { done: true, value: null };
         }
         if (
@@ -144,5 +181,21 @@ export class TextLines implements Iterable<TextLine> {
         return { done: true, value: null };
       },
     };
+
+    // pre-iterate if we need to, in order to fill the cache up to the startLine
+    while (i < this._startLine) {
+      if (this._offsetCache.length > this._startLine) {
+        i = this._startLine;
+        offset = self._offsetCache[i];
+        break;
+      }
+      i = this._offsetCache.length - 1;
+      offset = self._offsetCache[i];
+      const next = nexter.next();
+      if (next.done) {
+        return [].values();
+      }
+    }
+    return nexter;
   }
 }

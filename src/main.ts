@@ -17,12 +17,11 @@ import {
   ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import { TextLine, TextLines } from "./text-lines";
+import { TextLine, TextLines, BlobTextLines } from "./text-lines";
 import { MarkdownSection } from "./markdown-section";
-import {
-  CodemirrorMarkdownSection,
-  SyntaxTree,
-} from "./codemirror-markdown-section";
+import { CodemirrorTextLines } from "./codemirror-text-lines";
+export type SyntaxTree = ReturnType<typeof syntaxTree>;
+export type SyntaxNode = ReturnType<SyntaxTree["resolve"]>;
 
 interface button {
   container: HTMLElement;
@@ -45,14 +44,14 @@ function mkButton(name: string, icon: string, addTo?: HTMLElement): button {
 
 export class CopySectionWidget extends WidgetType {
   constructor(
-    private tree: SyntaxTree,
-    private headerStart: number,
+    private docLines: TextLines,
+    private startPos: number,
   ) {
     super();
   }
   toDOM(view: EditorView): HTMLElement {
+    const docLines = this.docLines;
     const doc = view.state.doc;
-    const tree = this.tree;
     const container = document.createElement("span");
     container.addClass("plugin-copy-section-buttons");
     const copyButton = mkButton("copy", "copy", container);
@@ -66,8 +65,10 @@ export class CopySectionWidget extends WidgetType {
           return;
         }
         debounce.lock = true;
-        const line = doc.lineAt(this.headerStart);
-        const section = new CodemirrorMarkdownSection(doc, tree, line.from);
+        const section = new MarkdownSection(
+          docLines,
+          doc.lineAt(this.startPos).number - 1,
+        );
         await navigator.clipboard.writeText(section.text);
         debounce.lock = false;
       },
@@ -95,6 +96,7 @@ class CopySectionButtonsPlugin implements PluginValue {
   buildDecorations(view: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
     const tree = syntaxTree(view.state);
+    const docLines = new CodemirrorTextLines(view.state.doc);
 
     for (let { from, to } of view.visibleRanges) {
       tree.iterate({
@@ -107,7 +109,7 @@ class CopySectionButtonsPlugin implements PluginValue {
               node.to,
               Decoration.widget({
                 side: 1,
-                widget: new CopySectionWidget(tree, node.from),
+                widget: new CopySectionWidget(docLines, node.from),
               }),
             );
           }
@@ -130,7 +132,7 @@ const copySectionEditorView = ViewPlugin.fromClass(
 
 function copySectionReaderView(app: App): MarkdownPostProcessor {
   let elSectionText: string;
-  let elSectionTextLines: TextLines;
+  let elSectionTextLines: BlobTextLines;
   return async (
     el: HTMLElement,
     ctx: MarkdownPostProcessorContext,
@@ -141,7 +143,7 @@ function copySectionReaderView(app: App): MarkdownPostProcessor {
     }
     if (elSectionText !== elSectionInfo.text) {
       elSectionText = elSectionInfo.text;
-      elSectionTextLines = new TextLines(elSectionText);
+      elSectionTextLines = new BlobTextLines(elSectionText);
     }
     if (!elSectionTextLines) {
       return;
