@@ -6,7 +6,7 @@ import {
   setIcon,
 } from "obsidian";
 import { syntaxTree } from "@codemirror/language";
-import { RangeSetBuilder, Text, Line } from "@codemirror/state";
+import { RangeSetBuilder, StateField, Text, Line } from "@codemirror/state";
 import {
   Decoration,
   DecorationSet,
@@ -17,9 +17,14 @@ import {
   ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import { TextLine, TextLines, BlobTextLines } from "./text-lines";
-import { MarkdownSection } from "./markdown-section";
-import { CodemirrorTextLines } from "./codemirror-text-lines";
+import {
+  SettingTab,
+  SectionCopySettings,
+  DEFAULT_SETTINGS,
+} from "./plugin/settings";
+import { TextLine, TextLines, BlobTextLines } from "./lib/text-lines";
+import { MarkdownSection } from "./lib/markdown-section";
+import { CodemirrorTextLines } from "./lib/codemirror-text-lines";
 export type SyntaxTree = ReturnType<typeof syntaxTree>;
 export type SyntaxNode = ReturnType<SyntaxTree["resolve"]>;
 
@@ -50,6 +55,7 @@ export class CopySectionWidget extends WidgetType {
     super();
   }
   toDOM(view: EditorView): HTMLElement {
+    const plugin = view.state.field(pluginField);
     const docLines = this.docLines;
     const doc = view.state.doc;
     const container = document.createElement("span");
@@ -68,6 +74,11 @@ export class CopySectionWidget extends WidgetType {
         const section = new MarkdownSection(
           docLines,
           doc.lineAt(this.startPos).number - 1,
+          // FIXME: settings do not update immediately on change if UI already rendered
+          {
+            ...DEFAULT_SETTINGS,
+            ...(plugin ? plugin.settings : {}),
+          },
         );
         await navigator.clipboard.writeText(section.text);
         debounce.lock = false;
@@ -130,7 +141,10 @@ const copySectionEditorView = ViewPlugin.fromClass(
   pluginSpec,
 );
 
-function copySectionReaderView(app: App): MarkdownPostProcessor {
+function copySectionReaderView(
+  app: App,
+  plugin: CopySectionPlugin,
+): MarkdownPostProcessor {
   let elSectionText: string;
   let elSectionTextLines: BlobTextLines;
   return async (
@@ -199,6 +213,10 @@ function copySectionReaderView(app: App): MarkdownPostProcessor {
           const section = new MarkdownSection(
             hSectionTextLines,
             hSectionTextStart,
+            {
+              ...DEFAULT_SETTINGS,
+              ...(plugin ? plugin.settings : {}),
+            },
           );
           await navigator.clipboard.writeText(section.text);
           debounce.lock = false;
@@ -208,13 +226,32 @@ function copySectionReaderView(app: App): MarkdownPostProcessor {
   };
 }
 
-export default class CopySectionPlugin extends Plugin {
-  onload() {
-    this.registerEditorExtension(copySectionEditorView);
-    this.registerMarkdownPostProcessor(copySectionReaderView(this.app));
+export class CopySectionPlugin extends Plugin {
+  settings: SectionCopySettings;
+  async onload() {
+    await this.loadSettings();
+    this.addSettingTab(new SettingTab(this.app, this));
+    this.registerEditorExtension([
+      pluginField.init(() => this),
+      copySectionEditorView,
+    ]);
+    this.registerMarkdownPostProcessor(copySectionReaderView(this.app, this));
   }
 
-  onunload() {
-    // Any additional cleanup if needed
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
   }
 }
+export const pluginField = StateField.define<CopySectionPlugin | null>({
+  create() {
+    return null;
+  },
+  update(state) {
+    return state;
+  },
+});
+export default CopySectionPlugin;
