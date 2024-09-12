@@ -3,9 +3,10 @@ import process from "process";
 import builtins from "builtin-modules";
 
 const watch = process.argv.includes("--watch");
+const dev = watch || process.argv.includes("--dev");
 
 const context = await esbuild.context({
-	entryPoints: ["main.ts"],
+	entryPoints: ["src/main.ts"],
 	bundle: true,
 	external: [
 		"obsidian",
@@ -25,10 +26,10 @@ const context = await esbuild.context({
 	format: "cjs",
 	target: "es2018",
 	logLevel: "info",
-	sourcemap: watch ? "inline" : false,
+	sourcemap: dev ? "inline" : false,
 	treeShaking: true,
 	outfile: "main.js",
-	minify: !watch,
+	minify: !dev,
 });
 
 if (watch) {

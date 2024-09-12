@@ -12,24 +12,55 @@
 
 .plugin-copy-section-button {
     pointer-events: visible;
+    user-select: none;
     cursor: default;
     opacity: var(--icon-opacity);
 }
 
-.HyperMD-header .plugin-copy-section-buttons {
+.HyperMD-header .plugin-copy-section-buttons,
+h1 .plugin-copy-section-buttons,
+h2 .plugin-copy-section-buttons,
+h3 .plugin-copy-section-buttons,
+h4 .plugin-copy-section-buttons,
+h5 .plugin-copy-section-buttons,
+h6 .plugin-copy-section-buttons {
     visibility: hidden;
 }
 
-.HyperMD-header:hover .plugin-copy-section-buttons {
+.HyperMD-header:hover .plugin-copy-section-buttons,
+h1:hover .plugin-copy-section-buttons,
+h2:hover .plugin-copy-section-buttons,
+h3:hover .plugin-copy-section-buttons,
+h4:hover .plugin-copy-section-buttons,
+h5:hover .plugin-copy-section-buttons,
+h6:hover .plugin-copy-section-buttons {
     visibility: visible;
 }
 
-.HyperMD-header:hover .plugin-copy-section-button:hover {
+.HyperMD-header:hover .plugin-copy-section-button:hover,
+h1:hover .plugin-copy-section-button:hover,
+h2:hover .plugin-copy-section-button:hover,
+h3:hover .plugin-copy-section-button:hover,
+h4:hover .plugin-copy-section-button:hover,
+h5:hover .plugin-copy-section-button:hover,
+h6:hover .plugin-copy-section-button:hover {
     opacity: var(--icon-opacity-hover);
     color: var(--icon-color-hover);
 }
 
 .HyperMD-header:hover .plugin-copy-section-button:active,
-.HyperMD-header:hover .plugin-copy-section-button:hover:active {
+.HyperMD-header:hover .plugin-copy-section-button:hover:active,
+h1:hover .plugin-copy-section-button.active,
+h1:hover .plugin-copy-section-button.active:hover,
+h2:hover .plugin-copy-section-button.active,
+h2:hover .plugin-copy-section-button.active:hover,
+h3:hover .plugin-copy-section-button.active,
+h3:hover .plugin-copy-section-button.active:hover,
+h4:hover .plugin-copy-section-button.active,
+h4:hover .plugin-copy-section-button.active:hover,
+h5:hover .plugin-copy-section-button.active,
+h5:hover .plugin-copy-section-button.active:hover,
+h6:hover .plugin-copy-section-button.active,
+h6:hover .plugin-copy-section-button.active:hover {
     color: var(--icon-color-active);
 }
