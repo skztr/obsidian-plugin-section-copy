@@ -3,6 +3,7 @@ import { TextLine, TextLines } from "../text-lines";
 import { TestStringIsTag } from "../obsidian";
 
 interface MarkdownSectionOptions {
+  includeSectionHeading?: boolean;
   stripComments?: boolean;
   stripModifiedEmpty?: boolean;
   stripTagLines?: boolean;
@@ -63,6 +64,10 @@ export class MarkdownSection implements Iterable<TextLine>, Section {
             firstLine = next.value.text;
             const eolMatch = firstLine.match(/(\r\n|\r|\n)$/);
             eol = eolMatch ? eolMatch[1] : "";
+            if (!options.includeSectionHeading) {
+              // skip the first line
+              continue;
+            }
           } else {
             if (codeBlock != "") {
               // FIXME: edge-case: Indentation seems to be handled inconsistently.

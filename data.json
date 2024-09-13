@@ -1,4 +1,5 @@
 {
+  "includeSectionHeading": false,
   "stripComments": true,
   "stripModifiedEmpty": true,
   "stripTagLines": true,
