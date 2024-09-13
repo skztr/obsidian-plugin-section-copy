@@ -1,4 +1,5 @@
 {
+  "excludeSubsections": true,
   "includeSectionHeading": false,
   "stripComments": true,
   "stripModifiedEmpty": true,

@@ -3,6 +3,7 @@ import { TextLine, TextLines } from "../text-lines";
 import { TestStringIsTag } from "../obsidian";
 
 interface MarkdownSectionOptions {
+  excludeSubsections?: boolean;
   includeSectionHeading?: boolean;
   stripComments?: boolean;
   stripModifiedEmpty?: boolean;
@@ -93,7 +94,7 @@ export class MarkdownSection implements Iterable<TextLine>, Section {
               const hMatch = next.value.text.match(/^(#+)\s/);
               if (hMatch) {
                 const sublevel = hMatch[1].length;
-                if (sublevel <= level) {
+                if (options.excludeSubsections || sublevel <= level) {
                   return { done: true, value: null };
                 }
               }

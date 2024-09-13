@@ -2,12 +2,14 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import { CopySectionPlugin } from "../../main";
 
 export interface SectionCopySettings {
+  excludeSubsections: boolean;
   includeSectionHeading: boolean;
   stripComments: boolean;
   stripModifiedEmpty: boolean;
   stripTagLines: boolean;
 }
 export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
+  excludeSubsections: true,
   includeSectionHeading: true,
   stripComments: false,
   stripModifiedEmpty: true,
@@ -35,6 +37,17 @@ export class SettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.includeSectionHeading)
           .onChange(async (value) => {
             this.plugin.settings.includeSectionHeading = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+    new Setting(containerEl)
+      .setName("Stop at Subsections")
+      .setDesc("Should copied section data exclude subsections?")
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.excludeSubsections)
+          .onChange(async (value) => {
+            this.plugin.settings.excludeSubsections = value;
             await this.plugin.saveSettings();
           }),
       );
