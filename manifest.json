@@ -1,7 +1,7 @@
 {
-	"id": "obsidian-plugin-copy-section",
+	"id": "copy-section",
 	"name": "Copy Section Plugin",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
 	"description": "adds a Copy button to the top of Headed sections",
 	"author": "skztr <skizotoro@gmail.com>",
