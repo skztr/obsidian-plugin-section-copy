@@ -107,13 +107,16 @@ class CopySectionButtonsPlugin implements PluginValue {
     const builder = new RangeSetBuilder<Decoration>();
     const tree = syntaxTree(view.state);
     const docLines = new CodemirrorTextLines(view.state.doc);
+    const plugin = view.state.field(pluginField);
+    const displayHeaders =
+      plugin?.displayLevels().map((l) => `header_header-${l}`) || [];
 
     for (let { from, to } of view.visibleRanges) {
       tree.iterate({
         from,
         to,
         enter(node) {
-          if (node.type.name.startsWith("header_")) {
+          if (displayHeaders.contains(node.type.name)) {
             builder.add(
               node.to,
               node.to,
@@ -166,7 +169,12 @@ function copySectionReaderView(
       return;
     }
 
-    const headers = el.findAll("h1, h2, h3, h4, h5, h6");
+    const headers = el.findAll(
+      plugin
+        .displayLevels()
+        .map((l) => `h${l}`)
+        .join(", "),
+    );
     for (let header of headers) {
       const container = header.createEl("span");
       container.addClass("plugin-copy-section-buttons");
@@ -243,6 +251,16 @@ export class CopySectionPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+
+  displayLevels(): (1 | 2 | 3 | 4 | 5 | 6)[] {
+    const displayLevels: (1 | 2 | 3 | 4 | 5 | 6)[] = [];
+    for (let level of [1, 2, 3, 4, 5, 6] as (1 | 2 | 3 | 4 | 5 | 6)[]) {
+      if (this.settings[`displayH${level}`]) {
+        displayLevels.push(level);
+      }
+    }
+    return displayLevels;
   }
 }
 export const pluginField = StateField.define<CopySectionPlugin | null>({

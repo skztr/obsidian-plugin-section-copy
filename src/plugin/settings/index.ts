@@ -2,6 +2,12 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import { CopySectionPlugin } from "../../main";
 
 export interface SectionCopySettings {
+  displayH1: boolean;
+  displayH2: boolean;
+  displayH3: boolean;
+  displayH4: boolean;
+  displayH5: boolean;
+  displayH6: boolean;
   excludeSubsections: boolean;
   includeSectionHeading: boolean;
   stripComments: boolean;
@@ -9,6 +15,12 @@ export interface SectionCopySettings {
   stripTagLines: boolean;
 }
 export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
+  displayH1: true,
+  displayH2: true,
+  displayH3: true,
+  displayH4: true,
+  displayH5: true,
+  displayH6: true,
   excludeSubsections: true,
   includeSectionHeading: true,
   stripComments: false,
@@ -88,5 +100,19 @@ export class SettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }),
       );
+
+    for (let level of [1, 2, 3, 4, 5, 6] as (1 | 2 | 3 | 4 | 5 | 6)[]) {
+      new Setting(containerEl)
+        .setName(`Display on Section Level ${level}`)
+        .setDesc(`Add a copy button to Level ${level} section headers`)
+        .addToggle((toggle: ToggleComponent) =>
+          toggle
+            .setValue(this.plugin.settings[`displayH${level}`])
+            .onChange(async (value) => {
+              this.plugin.settings[`displayH${level}`] = value;
+              await this.plugin.saveSettings();
+            }),
+        );
+    }
   }
 }
