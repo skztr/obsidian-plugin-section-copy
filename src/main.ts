@@ -55,7 +55,6 @@ export class CopySectionWidget extends WidgetType {
     super();
   }
   toDOM(view: EditorView): HTMLElement {
-    const plugin = view.state.field(pluginField);
     const docLines = this.docLines;
     const doc = view.state.doc;
     const container = document.createElement("span");
@@ -71,10 +70,10 @@ export class CopySectionWidget extends WidgetType {
           return;
         }
         debounce.lock = true;
+        const plugin = view.state.field(pluginField);
         const section = new MarkdownSection(
           docLines,
           doc.lineAt(this.startPos).number - 1,
-          // FIXME: settings do not update immediately on change if UI already rendered
           {
             ...DEFAULT_SETTINGS,
             ...(plugin ? plugin.settings : {}),
