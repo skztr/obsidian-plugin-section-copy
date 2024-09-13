@@ -27,6 +27,16 @@ h6 .plugin-copy-section-buttons {
     visibility: hidden;
 }
 
+.is-mobile .HyperMD-header .plugin-copy-section-buttons,
+.is-mobile h1 .plugin-copy-section-buttons,
+.is-mobile h2 .plugin-copy-section-buttons,
+.is-mobile h3 .plugin-copy-section-buttons,
+.is-mobile h4 .plugin-copy-section-buttons,
+.is-mobile h5 .plugin-copy-section-buttons,
+.is-mobile h6 .plugin-copy-section-buttons {
+    visibility: visible;
+}
+
 .HyperMD-header:hover .plugin-copy-section-buttons,
 h1:hover .plugin-copy-section-buttons,
 h2:hover .plugin-copy-section-buttons,
