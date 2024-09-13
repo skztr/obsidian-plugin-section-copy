@@ -10,6 +10,9 @@
 		"test": "jest",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
+	"repository": {
+		"url": "https://github.com/skztr/obsidian-plugin-section-copy"
+	},
 	"keywords": [
 		"obsidian",
 		"obsidian-md",
