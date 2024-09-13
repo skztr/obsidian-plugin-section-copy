@@ -3,11 +3,13 @@ import { CopySectionPlugin } from "../../main";
 
 export interface SectionCopySettings {
   stripComments: boolean;
-  stripTags: boolean;
+  stripModifiedEmpty: boolean;
+  stripTagLines: boolean;
 }
 export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
   stripComments: false,
-  stripTags: false,
+  stripModifiedEmpty: true,
+  stripTagLines: false,
 };
 
 export class SettingTab extends PluginSettingTab {
@@ -25,7 +27,7 @@ export class SettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Strip Comments")
-      .setDesc("Remove comments from copied section data?")
+      .setDesc("Remove comments when copying section data?")
       .addToggle((toggle: ToggleComponent) =>
         toggle
           .setValue(this.plugin.settings.stripComments)
@@ -35,13 +37,28 @@ export class SettingTab extends PluginSettingTab {
           }),
       );
     new Setting(containerEl)
-      .setName("Strip Tags")
-      .setDesc("Remove #tags from copied section data?")
+      .setName("Strip Tag Lines")
+      .setDesc(
+        "Strip out tags from lines which contain only #tags when copying section data?",
+      )
       .addToggle((toggle: ToggleComponent) =>
         toggle
-          .setValue(this.plugin.settings.stripTags)
+          .setValue(this.plugin.settings.stripTagLines)
           .onChange(async (value) => {
-            this.plugin.settings.stripTags = value;
+            this.plugin.settings.stripTagLines = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+    new Setting(containerEl)
+      .setName("Remove Modified-to-Empty Lines?")
+      .setDesc(
+        "If removing comments / tags / etc leaves a line empty, should the whole line be removed?",
+      )
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.stripModifiedEmpty)
+          .onChange(async (value) => {
+            this.plugin.settings.stripModifiedEmpty = value;
             await this.plugin.saveSettings();
           }),
       );

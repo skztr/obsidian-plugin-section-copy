@@ -155,52 +155,72 @@ describe("MarkdownSection", () => {
     const lines = new BlobTextLines(
       "# Section\na%%a comment%%b%%another comment\nwhich does not end%%on the same line\n",
     );
-    const expected = ["# Section\n", "ab", "on the same line\n"];
+    const expected = ["# Section\n", "ab\n", "on the same line\n"];
     const section = new MarkdownSection(lines, 0, { stripComments: true });
     const collected = [...section];
     expect(collected.map((t) => t.text)).toEqual(expected);
   });
 
   it("should optionally remove entire lines contained within comments", () => {
-    const lines = new BlobTextLines(
-      [
-        "# Section",
-        "a%%a comment%%b%%another comment",
-        "which does not end",
-        "for several lines%%but does eventually",
-        "%%entire lines which are comments still have newlines%%",
-        "followed by one which starts%%like this",
-        "and continues%%%%into another",
-        "immediately%%before ending",
-      ].join("\n") + "\n",
-    );
-    const expected = [
-      "# Section\n",
-      "ab",
-      "but does eventually\n",
-      "\n",
-      "followed by one which starts",
-      "before ending\n",
-    ];
-    const section = new MarkdownSection(lines, 0, { stripComments: true });
-    const collected = [...section];
-    expect(collected.map((t) => t.text)).toEqual(expected);
+    for (let option of [false, true]) {
+      const lines = new BlobTextLines(
+        [
+          "# Section",
+          "a%%a comment%%b%%another comment",
+          "which does not end",
+          "",
+          "for several lines%%but does eventually",
+          "%%entire lines which are comments still have newlines%%",
+          "followed by one which starts%%like this",
+          "and continues%%%%into another",
+          "immediately%%before ending",
+        ].join("\n") + "\n",
+      );
+      const expected = [
+        "# Section\n",
+        "ab\n",
+        ...(option ? [] : ["\n"]), // when true, remove the line. otherwise, keep it
+        ...(option ? [] : ["\n"]),
+        "but does eventually\n",
+        ...(option ? [] : ["\n"]),
+        "followed by one which starts\n",
+        ...(option ? [] : ["\n"]),
+        "before ending\n",
+      ];
+      const section = new MarkdownSection(lines, 0, {
+        stripComments: true,
+        stripModifiedEmpty: option,
+      });
+      const collected = [...section];
+      expect(collected.map((t) => t.text)).toEqual(expected);
+    }
   });
 
-  it("should optionally remove tags", () => {
-    const lines = new BlobTextLines(
-      [
-        "# Section",
-        "a #tag",
-        "#tag b #another",
-        "#LineWhichIsJustATag",
-        "#LineWhichIsJustTwo #Tags",
-      ].join("\n") + "\n",
-    );
-    const expected = ["# Section\n", "a \n", " b \n", "\n", " \n"];
-    const section = new MarkdownSection(lines, 0, { stripTags: true });
-    const collected = [...section];
-    expect(collected.map((t) => t.text)).toEqual(expected);
+  it("should optionally remove lines containing only tags", () => {
+    for (let option of [false, true]) {
+      const lines = new BlobTextLines(
+        [
+          "# Section",
+          "a #tag",
+          "#tag b #another",
+          "#LineWhichIsJustATag",
+          "#LineWhichIsJustTwo #Tags",
+        ].join("\n") + "\n",
+      );
+      const expected = [
+        "# Section\n",
+        "a #tag\n",
+        "#tag b #another\n",
+        ...(option ? [] : ["\n"]),
+        ...(option ? [] : ["\n"]),
+      ];
+      const section = new MarkdownSection(lines, 0, {
+        stripTagLines: true,
+        stripModifiedEmpty: option,
+      });
+      const collected = [...section];
+      expect(collected.map((t) => t.text)).toEqual(expected);
+    }
   });
 
   it("should not remove tags from comments", () => {
@@ -210,17 +230,19 @@ describe("MarkdownSection", () => {
         "a #tag",
         "a %%comment with a #tag%%",
         "a %%multi-line comment",
-        "with a #tag in it%%",
+        " #including #atag #onlyline",
+        "and another with a #tag in it%%",
       ].join("\n") + "\n",
     );
     const expected = [
       "# Section\n",
-      "a \n",
+      "a #tag\n",
       "a %%comment with a #tag%%\n",
       "a %%multi-line comment\n",
-      "with a #tag in it%%\n",
+      " #including #atag #onlyline\n",
+      "and another with a #tag in it%%\n",
     ];
-    const section = new MarkdownSection(lines, 0, { stripTags: true });
+    const section = new MarkdownSection(lines, 0, { stripTagLines: true });
     const collected = [...section];
     expect(collected.map((t) => t.text)).toEqual(expected);
   });

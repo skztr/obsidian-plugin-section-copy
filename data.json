@@ -1,4 +1,6 @@
 {
   "stripComments": true,
+  "stripModifiedEmpty": true,
+  "stripTagLines": true,
   "stripTags": false
 }
