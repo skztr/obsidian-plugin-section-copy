@@ -3,9 +3,7 @@
 	"name": "Copy Section Plugin",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "",
-	"author": "",
-	"authorUrl": "",
-    "fundingUrl": "",
+	"description": "adds a Copy button to the top of Headed sections",
+	"author": "skztr <skizotoro@gmail.com>",
 	"isDesktopOnly": false
 }

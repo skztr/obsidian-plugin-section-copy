@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-base-plugin",
+	"name": "obsidian-plugin-section-copy",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Obsidian.md plugin adding a Copy button to the top of Headed sections",
 	"main": "main.js",
 	"scripts": {
 		"watch": "node esbuild.config.mjs --watch",
@@ -10,8 +10,12 @@
 		"test": "jest",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": [],
-	"author": "",
+	"keywords": [
+		"obsidian",
+		"obsidian-md",
+		"obsidian-plugin"
+	],
+	"author": "skztr <skizotoro@gmail.com>",
 	"license": "MIT",
 	"devDependencies": {
 		"@codemirror/language": "^6.10.2",
