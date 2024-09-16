@@ -69,20 +69,6 @@ export function copySectionReaderView(
             return;
           }
 
-          /*
-          // Note: this method doesn't work, as it will only capture "rendered" elements
-          // So instead, we need to fall back to using the source
-          const sectionInfo = ctx.getSectionInfo(delegateTarget);
-          const range = delegateTarget.doc.createRange();
-          const section = new DOMSection(delegateTarget);
-          range.setStartBefore(section.startElement);
-          range.setEndAfter(section.endElement);
-          const selection = window.getSelection();
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-          document.execCommand("copy");
-          selection?.removeAllRanges();
-          */
           const section = new MarkdownSection(
             hSectionTextLines,
             hSectionTextStart,
