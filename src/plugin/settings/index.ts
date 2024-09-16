@@ -101,6 +101,10 @@ export class SettingTab extends PluginSettingTab {
           }),
       );
 
+    new Setting(containerEl)
+      .setName("Section Levels Where the Copy Button Should Display")
+      .setDesc("Note: a reload is required for these to take effect.")
+      .setHeading();
     for (let level of [1, 2, 3, 4, 5, 6] as (1 | 2 | 3 | 4 | 5 | 6)[]) {
       new Setting(containerEl)
         .setName(`Display on Section Level ${level}`)
