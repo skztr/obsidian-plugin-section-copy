@@ -21,7 +21,7 @@ export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
   displayH4: true,
   displayH5: true,
   displayH6: true,
-  excludeSubsections: true,
+  excludeSubsections: false,
   includeSectionHeading: true,
   stripComments: false,
   stripModifiedEmpty: true,
