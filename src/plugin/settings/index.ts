@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
-import { CopySectionPlugin } from "../../main";
+import { CopySectionPlugin } from "..";
 
 export interface SectionCopySettings {
   displayH1: boolean;
