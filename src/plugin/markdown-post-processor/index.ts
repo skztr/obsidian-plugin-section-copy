@@ -72,10 +72,7 @@ export function copySectionReaderView(
           const section = new MarkdownSection(
             hSectionTextLines,
             hSectionTextStart,
-            {
-              ...DEFAULT_SETTINGS,
-              ...(plugin ? plugin.settings : {}),
-            },
+            plugin.settings,
           );
           await navigator.clipboard.writeText(section.text);
           debounce.lock = false;

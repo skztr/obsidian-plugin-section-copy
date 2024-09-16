@@ -13,7 +13,6 @@ import {
 import { TextLines } from "../../lib/text-lines";
 import { MarkdownSection } from "../../lib/markdown-section";
 import { CodemirrorTextLines } from "../../lib/codemirror-text-lines";
-import { DEFAULT_SETTINGS } from "../settings";
 import { mkButton } from "../button";
 import { pluginField } from "..";
 
@@ -41,13 +40,13 @@ class CopySectionWidget extends WidgetType {
         }
         debounce.lock = true;
         const plugin = view.state.field(pluginField);
+        if (!plugin) {
+          return;
+        }
         const section = new MarkdownSection(
           docLines,
           doc.lineAt(this.startPos).number - 1,
-          {
-            ...DEFAULT_SETTINGS,
-            ...(plugin ? plugin.settings : {}),
-          },
+          plugin.settings,
         );
         await navigator.clipboard.writeText(section.text);
         debounce.lock = false;
