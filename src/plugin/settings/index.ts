@@ -1,19 +1,30 @@
 import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import { CopySectionPlugin } from "..";
 
-export interface SectionCopySettings {
+export interface SectionCopyDisplaySettings {
   displayH1: boolean;
   displayH2: boolean;
   displayH3: boolean;
   displayH4: boolean;
   displayH5: boolean;
   displayH6: boolean;
+}
+
+export interface SectionCopyCaptureSettings {
   excludeSubsections: boolean;
   includeSectionHeading: boolean;
+}
+
+export interface SectionCopyTweakSettings {
   stripComments: boolean;
   stripModifiedEmpty: boolean;
   stripTagLines: boolean;
 }
+
+export type SectionCopySettings = SectionCopyCaptureSettings &
+  SectionCopyDisplaySettings &
+  SectionCopyTweakSettings;
+
 export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
   displayH1: true,
   displayH2: true,

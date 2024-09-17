@@ -1,5 +1,5 @@
 import { syntaxTree } from "@codemirror/language";
-import { RangeSetBuilder, StateField, Text, Line } from "@codemirror/state";
+import { RangeSetBuilder } from "@codemirror/state";
 import {
   Decoration,
   DecorationSet,
@@ -10,21 +10,15 @@ import {
   ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import { TextLines } from "../../lib/text-lines";
-import { MarkdownSection } from "../../lib/markdown-section";
-import { CodemirrorTextLines } from "../../lib/codemirror-text-lines";
 import { mkButton } from "../button";
 import { pluginField } from "..";
+import { sectionMarkdown } from "../section";
 
 class CopySectionWidget extends WidgetType {
-  constructor(
-    private docLines: TextLines,
-    private startPos: number,
-  ) {
+  constructor(private startPos: number) {
     super();
   }
   toDOM(view: EditorView): HTMLElement {
-    const docLines = this.docLines;
     const doc = view.state.doc;
     const container = document.createElement("span");
     container.addClass("plugin-copy-section-buttons");
@@ -38,18 +32,24 @@ class CopySectionWidget extends WidgetType {
         if (debounce.lock) {
           return;
         }
-        debounce.lock = true;
-        const plugin = view.state.field(pluginField);
-        if (!plugin) {
-          return;
+        try {
+          debounce.lock = true;
+          const plugin = view.state.field(pluginField);
+          if (!plugin) {
+            return;
+          }
+          const sectionText = sectionMarkdown(
+            plugin,
+            doc,
+            doc.lineAt(this.startPos).from,
+          );
+          await navigator.clipboard.writeText(sectionText);
+        } catch (e) {
+          // ignore it, probably nothing, right?
+          // throw e;
+        } finally {
+          debounce.lock = false;
         }
-        const section = new MarkdownSection(
-          docLines,
-          doc.lineAt(this.startPos).number - 1,
-          plugin.settings,
-        );
-        await navigator.clipboard.writeText(section.text);
-        debounce.lock = false;
       },
     );
 
@@ -75,7 +75,6 @@ class CopySectionButtonsPlugin implements PluginValue {
   buildDecorations(view: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
     const tree = syntaxTree(view.state);
-    const docLines = new CodemirrorTextLines(view.state.doc);
     const plugin = view.state.field(pluginField);
     const displayHeaders =
       plugin?.displayLevels().map((l) => `header_header-${l}`) || [];
@@ -91,7 +90,7 @@ class CopySectionButtonsPlugin implements PluginValue {
               node.to,
               Decoration.widget({
                 side: 1,
-                widget: new CopySectionWidget(docLines, node.from),
+                widget: new CopySectionWidget(node.from),
               }),
             );
           }

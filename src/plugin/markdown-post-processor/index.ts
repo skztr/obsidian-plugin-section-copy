@@ -3,35 +3,20 @@ import {
   MarkdownPostProcessor,
   MarkdownPostProcessorContext,
 } from "obsidian";
-import { BlobTextLines } from "../../lib/text-lines";
-import { MarkdownSection } from "../../lib/markdown-section";
-import { DEFAULT_SETTINGS } from "../settings";
 import { mkButton } from "../button";
 import { CopySectionPlugin } from "..";
+import { sectionMarkdown } from "../section";
 
 export function copySectionReaderView(
   app: App,
   plugin: CopySectionPlugin,
 ): MarkdownPostProcessor {
-  let elSectionText: string;
-  let elSectionTextLines: BlobTextLines;
   return async (
     el: HTMLElement,
     ctx: MarkdownPostProcessorContext,
   ): Promise<void> => {
     const elSectionInfo = ctx.getSectionInfo(el);
     if (!elSectionInfo) {
-      return;
-    }
-    if (elSectionText !== elSectionInfo.text) {
-      elSectionText = elSectionInfo.text;
-      elSectionTextLines = new BlobTextLines(elSectionText);
-    }
-    if (!elSectionTextLines) {
-      return;
-    }
-    const firstLine = elSectionTextLines[elSectionInfo.lineStart];
-    if (!firstLine || !/^#+\s/.test(firstLine.text)) {
       return;
     }
 
@@ -59,8 +44,6 @@ export function copySectionReaderView(
           delegateTarget.ownerDocument.on("mouseup", "*", rm);
         },
       );
-      const hSectionTextLines = elSectionTextLines;
-      const hSectionTextStart = elSectionInfo.lineStart;
       copyButton.container.on(
         "click",
         "span",
@@ -68,14 +51,27 @@ export function copySectionReaderView(
           if (debounce.lock) {
             return;
           }
-
-          const section = new MarkdownSection(
-            hSectionTextLines,
-            hSectionTextStart,
-            plugin.settings,
-          );
-          await navigator.clipboard.writeText(section.text);
-          debounce.lock = false;
+          try {
+            debounce.lock = true;
+            const offset =
+              elSectionInfo.lineStart === 0
+                ? 0
+                : elSectionInfo.text
+                    .split("\n", elSectionInfo.lineStart + 1)
+                    .slice(0, elSectionInfo.lineStart)
+                    .join("\n").length + 1;
+            const sectionText = sectionMarkdown(
+              plugin,
+              elSectionInfo.text,
+              offset,
+            );
+            await navigator.clipboard.writeText(sectionText);
+          } catch (e) {
+            // ignore it, probably nothing, right?
+            // throw e;
+          } finally {
+            debounce.lock = false;
+          }
         },
       );
     }
