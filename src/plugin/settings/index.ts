@@ -53,7 +53,7 @@ export class SettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("Include Section Heading")
+      .setName("Include section heading")
       .setDesc("Should copied section data include the section heading?")
       .addToggle((toggle: ToggleComponent) =>
         toggle
@@ -64,7 +64,7 @@ export class SettingTab extends PluginSettingTab {
           }),
       );
     new Setting(containerEl)
-      .setName("Stop at Subsections")
+      .setName("Stop at subsections")
       .setDesc("Should copied section data exclude subsections?")
       .addToggle((toggle: ToggleComponent) =>
         toggle
@@ -75,7 +75,7 @@ export class SettingTab extends PluginSettingTab {
           }),
       );
     new Setting(containerEl)
-      .setName("Strip Comments")
+      .setName("Strip comments")
       .setDesc("Remove comments when copying section data?")
       .addToggle((toggle: ToggleComponent) =>
         toggle
@@ -86,7 +86,7 @@ export class SettingTab extends PluginSettingTab {
           }),
       );
     new Setting(containerEl)
-      .setName("Strip Tag Lines")
+      .setName("Strip tag lines")
       .setDesc(
         "Strip out tags from lines which contain only #tags when copying section data?",
       )
@@ -99,7 +99,7 @@ export class SettingTab extends PluginSettingTab {
           }),
       );
     new Setting(containerEl)
-      .setName("Remove Modified-to-Empty Lines?")
+      .setName("Remove modified-to-empty lines?")
       .setDesc(
         "If removing comments / tags / etc leaves a line empty, should the whole line be removed?",
       )
@@ -113,13 +113,13 @@ export class SettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Section Levels Where the Copy Button Should Display")
+      .setName("Section levels where the copy button should display")
       .setDesc("Note: a reload is required for these to take effect.")
       .setHeading();
     for (let level of [1, 2, 3, 4, 5, 6] as (1 | 2 | 3 | 4 | 5 | 6)[]) {
       new Setting(containerEl)
-        .setName(`Display on Section Level ${level}`)
-        .setDesc(`Add a copy button to Level ${level} section headers`)
+        .setName(`Display on section level ${level}`)
+        .setDesc(`Add a copy button to level ${level} section headers`)
         .addToggle((toggle: ToggleComponent) =>
           toggle
             .setValue(this.plugin.settings[`displayH${level}`])
