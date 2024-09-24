@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-plugin-copy-section",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Obsidian.md plugin adding a Copy button to the top of Headed sections",
 	"main": "main.js",
 	"scripts": {
