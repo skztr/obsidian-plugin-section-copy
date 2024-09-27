@@ -11,8 +11,20 @@ describe("textTweaker", () => {
     comment%%
     text line
   `);
-  it("should just return the original string in the trivial case with no settings", () => {
+  it("should just return the original string in the trivial cases", () => {
     expect(textTweaker(MARKDOWN_BASIC, {})).toEqual(MARKDOWN_BASIC);
+    expect(
+      textTweaker("", { stripComments: true, stripTagLines: true }),
+    ).toEqual("");
+    expect(
+      textTweaker(" ", { stripComments: true, stripTagLines: true }),
+    ).toEqual(" ");
+    expect(
+      textTweaker("foo bar baz", { stripComments: true, stripTagLines: true }),
+    ).toEqual("foo bar baz");
+    expect(
+      textTweaker("foo #bar baz", { stripComments: true, stripTagLines: true }),
+    ).toEqual("foo #bar baz");
   });
 
   it("should replace comments on request", () => {
