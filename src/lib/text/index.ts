@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export { invisibles } from "./invisibles";
 export { onlyMatch } from "./onlyMatch";
 export type { SliceStringer, StringSlicer } from "./sliceText";
