@@ -22,8 +22,10 @@ export function* markdownSyntaxLeaves(
         const gap = SyntaxNode.createGap(prev, node);
         yield gap;
       }
-      yield node;
-      prev = node;
+      if (node.position.from < node.position.to) {
+        yield node;
+        prev = node;
+      }
     }
 
     if (node.firstChild) {

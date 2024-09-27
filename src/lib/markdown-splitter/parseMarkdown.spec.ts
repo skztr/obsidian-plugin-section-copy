@@ -43,6 +43,14 @@ function spansExpect(spans: testSpan[]): SimpleSpan[] {
 }
 
 describe("markdownSpans", () => {
+  it("Should turn empty text into nothing", () => {
+    const spans: testSpan[] = [{ unparsed: "" }];
+    const collected = [
+      ...parseMarkdown(spans.map((s) => s.unparsed).join(""), []),
+    ];
+    expect(collected).toEqual([]);
+  });
+
   it("Should turn uninteresting text into a single text span", () => {
     const spans: testSpan[] = [{ unparsed: "foo bar baz" }];
     const collected = [
