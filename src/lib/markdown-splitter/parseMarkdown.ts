@@ -1,5 +1,5 @@
 import { remark } from "remark";
-import { Node, Parent } from "unist";
+import { Root } from "mdast";
 import { SyntaxNode, SyntaxNodeType, SimpleSpan } from "./syntaxNode";
 
 /**
@@ -8,11 +8,7 @@ import { SyntaxNode, SyntaxNodeType, SimpleSpan } from "./syntaxNode";
 export function* markdownSyntaxLeaves(
   doc: string,
 ): Generator<SyntaxNode, void, unknown> {
-  const root: Node | Parent = remark().parse(doc);
-  if (!("children" in root)) {
-    return;
-  }
-
+  const root: Root = remark().parse(doc);
   const stack: SyntaxNode[] = [];
   let prev: SyntaxNode | undefined;
   let next: SyntaxNode | undefined = new SyntaxNode(doc, root);
