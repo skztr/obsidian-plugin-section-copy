@@ -185,6 +185,7 @@ function* tweakSpans(
     }
 
     if (state === tweakSpansState.InComment) {
+      /* istanbul ignore if */ /* this is an assertion / sanity check */
       if (!next) {
         throw new Error(
           "Logic Error: still in a comment, but no 'next' node is waiting for us",
