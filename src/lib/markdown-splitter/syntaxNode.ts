@@ -43,7 +43,7 @@ export class SyntaxNode {
     if (!prev && !next) {
       throw new Error("can't gap between nothing and nothing");
     }
-    const doc = prev?.doc || (next?.doc as string);
+    const doc = prev?.doc || ((next as SyntaxNode).doc as string);
     const position = SyntaxNodePosition.gap(
       doc,
       prev?.position,
