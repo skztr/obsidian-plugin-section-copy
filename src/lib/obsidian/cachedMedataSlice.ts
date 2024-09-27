@@ -126,7 +126,7 @@ export class CachedMetadataSlice {
   }
   public *getSections(): Generator<SectionCache, void, unknown> {
     for (let i of this.getSectionIndexes()) {
-      yield this.metadata.sections?.[i] as SectionCache;
+      yield (this.metadata.sections as SectionCache[])[i] as SectionCache;
     }
   }
 
@@ -136,17 +136,25 @@ export class CachedMetadataSlice {
   public *getSectionsExpanded(): Generator<SectionCache, void, unknown> {
     let prev: SectionCache | undefined;
     for (let i of this.getSectionIndexes()) {
-      const section = this.metadata.sections?.[i] as SectionCache;
-      if (prev && prev.position.end.offset < section.position.start.offset) {
+      const section = (this.metadata.sections as SectionCache[])[
+        i
+      ] as SectionCache;
+      if (
+        (!prev && this.from < section.position.start.offset) ||
+        (prev && prev.position.end.offset < section.position.start.offset)
+      ) {
         yield {
           type: "gap",
           position: {
-            start: prev.position.end,
+            start: prev
+              ? prev.position.end
+              : { col: 0, line: 0, offset: this.from },
             end: section.position.start,
           },
         };
       }
       yield section;
+      prev = section;
     }
     if (!prev || prev.position.end.offset < this.to) {
       yield {

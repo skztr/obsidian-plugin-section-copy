@@ -1,4 +1,4 @@
-import { CachedMetadata, HeadingCache, SectionCache } from "obsidian";
+import { CachedMetadata, HeadingCache, Loc, SectionCache } from "obsidian";
 import { SyntaxNodePosition } from "../markdown-splitter/syntaxNodePosition";
 import { CachedMetadataSlice } from "./cachedMedataSlice";
 
@@ -289,6 +289,116 @@ describe("CachedMetadataSlice", () => {
           .sliceRelative(headings[2].position.end.offset)
           .getHeadingRelative(2),
       ).toEqual(undefined);
+    });
+  });
+
+  // Note: Internally this uses the same logic as getHeadingIndexes, so we just need to verify that this uses the
+  // sections array instead of the headings array
+  describe("getSectionIndexes", () => {
+    it("should output all section indexes in the metadata with no end specified", () => {
+      const slice = new CachedMetadataSlice(BASIC_METADATA_CACHE, 0);
+      expect([...slice.getSectionIndexes()]).toEqual([
+        0, 1, 2, 3, 4, 5, 6, 7, 8,
+      ]);
+    });
+  });
+
+  // Note: Internally this uses the same logic as getHeading, so we just need to verify that this uses the
+  // sections array instead of the headings array
+  describe("getSections", () => {
+    it("is an alias that returns the SectionCache directly, based on the SectionIndexes", () => {
+      const slice = new CachedMetadataSlice(BASIC_METADATA_CACHE, 0);
+      expect([...slice.getSections()]).toEqual(BASIC_METADATA_CACHE.sections);
+    });
+  });
+
+  describe("getSectionsExpanded", () => {
+    it("returns the SectionCache directly if there are no gaps", () => {
+      const slice = new CachedMetadataSlice(BASIC_METADATA_CACHE, 0);
+      expect([...slice.getSectionsExpanded()]).toEqual(
+        BASIC_METADATA_CACHE.sections,
+      );
+    });
+
+    it("adds a gap at the beginning if the first section doesn't start at the beginning of the text", () => {
+      const cache: CachedMetadata = mkCachedMetadata(BASIC_METADATA);
+      const sections = cache.sections as SectionCache[];
+      sections[0].position.start.offset += 5;
+      const slice = new CachedMetadataSlice(cache, 0);
+      expect([...slice.getSectionsExpanded()]).toEqual([
+        {
+          type: "gap",
+          position: {
+            start: {
+              col: 0,
+              line: 0,
+              offset: 0,
+            },
+            end: {
+              col: 0, // intentionally "wrong". ie: we don't bother
+              line: 0,
+              offset: 5,
+            },
+          },
+        },
+        ...sections,
+      ]);
+    });
+
+    it("adds a gap between two sections if there is a start after the previous end", () => {
+      const cache: CachedMetadata = mkCachedMetadata(BASIC_METADATA);
+      const sections = cache.sections as SectionCache[];
+      sections[1].position.start.offset += 5;
+      const slice = new CachedMetadataSlice(cache, 0);
+      expect([...slice.getSectionsExpanded()]).toEqual([
+        cache.sections?.[0],
+        {
+          type: "gap",
+          position: {
+            start: sections[0].position.end,
+            end: sections[1].position.start,
+          },
+        },
+        ...sections.slice(1),
+      ]);
+    });
+
+    it("adds a gap at the end if the final section ends before the end of the range", () => {
+      const cache: CachedMetadata = mkCachedMetadata(BASIC_METADATA);
+      const sections = cache.sections as SectionCache[];
+      sections[sections.length - 1].position.end.offset -= 5;
+      const slice = new CachedMetadataSlice(
+        cache,
+        0,
+        sections[sections.length - 1].position.end.offset + 5,
+      );
+      expect([...slice.getSectionsExpanded()]).toEqual([
+        ...sections,
+        {
+          type: "gap",
+          position: {
+            start: sections[sections.length - 1].position.end,
+            end: {
+              col: 0,
+              line: 0,
+              offset: sections[sections.length - 1].position.end.offset + 5,
+            },
+          },
+        },
+      ]);
+    });
+
+    it("adds a gap over the whole range if there are no sections", () => {
+      const slice = new CachedMetadataSlice({}, 0, 10);
+      expect([...slice.getSectionsExpanded()]).toEqual([
+        {
+          type: "gap",
+          position: {
+            start: { col: 0, line: 0, offset: 0 },
+            end: { col: 0, line: 0, offset: 10 },
+          },
+        },
+      ]);
     });
   });
 });
