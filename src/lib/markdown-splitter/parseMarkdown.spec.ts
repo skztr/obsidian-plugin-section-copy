@@ -206,7 +206,18 @@ describe("markdownSpans", () => {
   });
 
   it("Should consider tags not surrounded by whitespace to be invalid", () => {
-    const spans: testSpan[] = [{ unparsed: "leading #foo#bar trailing" }];
+    const spans: testSpan[] = [{ unparsed: "#foo#bar foo#bar" }];
+    const collected = [...parseMarkdown(spans.map((s) => s.unparsed).join(""))];
+    expect(collected).toEqual(spansExpect(spans));
+  });
+
+  it("Should find tags after an invalid tag", () => {
+    const spans: testSpan[] = [
+      { unparsed: "#foo#bar " },
+      { unparsed: "#bar", expectedType: SyntaxNodeType.Tag },
+      { unparsed: " foo#bar " },
+      { unparsed: "#baz", expectedType: SyntaxNodeType.Tag },
+    ];
     const collected = [...parseMarkdown(spans.map((s) => s.unparsed).join(""))];
     expect(collected).toEqual(spansExpect(spans));
   });

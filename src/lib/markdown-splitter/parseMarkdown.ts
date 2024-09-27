@@ -118,31 +118,34 @@ const tweakSpansRules: tweakSpansRule[] = [
   (text, offset) => {
     const tagRegExp =
       /#[^\u2000-\u206F\u2E00-\u2E7F'!"#$%&()*+,.:;<=>?@^`{|}~\[\]\\\s]+/gu;
-    tagRegExp.lastIndex = offset;
-    const match = tagRegExp.exec(text);
-    if (!match) {
-      return undefined;
+
+    while (offset < text.length) {
+      tagRegExp.lastIndex = offset;
+      const match = tagRegExp.exec(text);
+      if (!match) {
+        return undefined;
+      }
+
+      const start = match.index as number;
+      if (start !== 0 && !/\s/.test(text[start - 1])) {
+        // if tags aren't at the beginning of the document, they must follow whitespace
+        offset = start + 1;
+        continue;
+      }
+      if (
+        start + match[0].length < text.length &&
+        !/\s/.test(text[start + match[0].length])
+      ) {
+        // if tags aren't at the end of the document, they must be followed by whitespace
+        offset = start + 1;
+        continue;
+      }
+      return {
+        type: SyntaxNodeType.Tag,
+        from: start,
+        to: start + match[0].length,
+      };
     }
-    const start = match.index;
-    if (start === undefined) {
-      return undefined;
-    }
-    if (start !== 0 && !/\s/.test(text[start - 1])) {
-      // if tags aren't at the end of the document, they must follow whitespace
-      return undefined;
-    }
-    if (
-      start + match[0].length < text.length &&
-      !/\s/.test(text[start + match[0].length])
-    ) {
-      // if tags aren't at the beginning of the document, they must follow whitespace
-      return undefined;
-    }
-    return {
-      type: SyntaxNodeType.Tag,
-      from: start,
-      to: start + match[0].length,
-    };
   },
 ];
 
