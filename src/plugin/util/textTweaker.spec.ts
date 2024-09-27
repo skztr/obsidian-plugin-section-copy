@@ -77,26 +77,22 @@ describe("textTweaker", () => {
       # Header Level 1
       #tag #only #line
       text and #tag line
-      %%comment%%
-    `);
+      %%comment%%`);
     const expected =
       unindent(`
       # Header Level 1
       #tag #only #line
-      text and #tag line
-    `) + "\n";
+      text and #tag line`) + "\n";
     expect(textTweaker(original, { stripComments: true })).toEqual(expected);
   });
 
   it("should replace trailing tag lines on request", () => {
     const original = unindent(`
       # Header Level 1
-      #tag #only #line
-    `);
+      #tag #only #line`);
     const expected =
       unindent(`
-      # Header Level 1
-    `) + "\n";
+      # Header Level 1`) + "\n";
     expect(textTweaker(original, { stripTagLines: true })).toEqual(expected);
   });
 
@@ -104,13 +100,8 @@ describe("textTweaker", () => {
     const originalTagLine = unindent(`
       # Header Level 1
       %%comment%%
-      #tag #only #line
-    `);
-    const expectedTagLine = unindent(`
-      # Header Level 1
-
-
-    `);
+      #tag #only #line`);
+    const expectedTagLine = `# Header Level 1\n\n`;
     expect(
       textTweaker(originalTagLine, {
         stripComments: true,
@@ -121,13 +112,8 @@ describe("textTweaker", () => {
     const originalComment = unindent(`
       # Header Level 1
       #tag #only #line
-      %%comment%%
-    `);
-    const expectedComment = unindent(`
-      # Header Level 1
-
-      
-    `);
+      %%comment%%`);
+    const expectedComment = `# Header Level 1\n\n`;
     expect(
       textTweaker(originalComment, {
         stripComments: true,
