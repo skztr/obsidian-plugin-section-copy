@@ -6,6 +6,7 @@ export enum SyntaxNodeType {
   Comment = "comment",
   Gap = "gap",
   Literal = "literal",
+  Metadata = "metadata",
   Tag = "tag",
   Text = "text",
 }
@@ -135,6 +136,7 @@ export class SyntaxNode {
       inlineCode: SyntaxNodeType.Literal,
       tag: SyntaxNodeType.Tag,
       text: SyntaxNodeType.Text,
+      thematicBreak: SyntaxNodeType.Text,
     };
     if (this.node.type in mapped) {
       return mapped[this.node.type];

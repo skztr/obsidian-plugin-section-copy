@@ -2,6 +2,7 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import { CopySectionPlugin } from "..";
 
 export interface SectionCopyDisplaySettings {
+  displayTitle: boolean;
   displayH1: boolean;
   displayH2: boolean;
   displayH3: boolean;
@@ -17,6 +18,7 @@ export interface SectionCopyCaptureSettings {
 
 export interface SectionCopyTweakSettings {
   stripComments: boolean;
+  stripMetadata: boolean;
   stripModifiedEmpty: boolean;
   stripTagLines: boolean;
 }
@@ -26,6 +28,7 @@ export type SectionCopySettings = SectionCopyCaptureSettings &
   SectionCopyTweakSettings;
 
 export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
+  displayTitle: true,
   displayH1: true,
   displayH2: true,
   displayH3: true,
@@ -35,6 +38,7 @@ export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
   excludeSubsections: false,
   includeSectionHeading: true,
   stripComments: false,
+  stripMetadata: true,
   stripModifiedEmpty: true,
   stripTagLines: false,
 };
@@ -86,6 +90,17 @@ export class SettingTab extends PluginSettingTab {
           }),
       );
     new Setting(containerEl)
+      .setName("Strip metadata")
+      .setDesc("Remove metadata when copying whole files?")
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.stripMetadata)
+          .onChange(async (value) => {
+            this.plugin.settings.stripMetadata = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+    new Setting(containerEl)
       .setName("Strip tag lines")
       .setDesc(
         "Strip out tags from lines which contain only #tags when copying section data?",
@@ -116,6 +131,19 @@ export class SettingTab extends PluginSettingTab {
       .setName("Section levels where the copy button should display")
       .setDesc("Note: a reload is required for these to take effect.")
       .setHeading();
+
+    new Setting(containerEl)
+      .setName(`Display on title`)
+      .setDesc(`Add a copy button to the title`)
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.displayTitle)
+          .onChange(async (value) => {
+            this.plugin.settings.displayTitle = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
     for (let level of [1, 2, 3, 4, 5, 6] as (1 | 2 | 3 | 4 | 5 | 6)[]) {
       new Setting(containerEl)
         .setName(`Display on section level ${level}`)

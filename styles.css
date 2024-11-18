@@ -17,6 +17,7 @@
     opacity: var(--icon-opacity);
 }
 
+.inline-title .plugin-copy-section-buttons,
 .HyperMD-header .plugin-copy-section-buttons,
 h1 .plugin-copy-section-buttons,
 h2 .plugin-copy-section-buttons,
@@ -27,6 +28,7 @@ h6 .plugin-copy-section-buttons {
     visibility: hidden;
 }
 
+.is-mobile .inline-title .plugin-copy-section-buttons,
 .is-mobile .HyperMD-header .plugin-copy-section-buttons,
 .is-mobile h1 .plugin-copy-section-buttons,
 .is-mobile h2 .plugin-copy-section-buttons,
@@ -37,6 +39,7 @@ h6 .plugin-copy-section-buttons {
     visibility: visible;
 }
 
+.inline-title:hover .plugin-copy-section-buttons,
 .HyperMD-header:hover .plugin-copy-section-buttons,
 h1:hover .plugin-copy-section-buttons,
 h2:hover .plugin-copy-section-buttons,
@@ -47,6 +50,7 @@ h6:hover .plugin-copy-section-buttons {
     visibility: visible;
 }
 
+.inline-title:hover .plugin-copy-section-button:hover,
 .HyperMD-header:hover .plugin-copy-section-button:hover,
 h1:hover .plugin-copy-section-button:hover,
 h2:hover .plugin-copy-section-button:hover,
@@ -58,6 +62,7 @@ h6:hover .plugin-copy-section-button:hover {
     color: var(--icon-color-hover);
 }
 
+.inline-title:hover .plugin-copy-section-button:active,
 .HyperMD-header:hover .plugin-copy-section-button:active,
 .HyperMD-header:hover .plugin-copy-section-button:hover:active,
 h1:hover .plugin-copy-section-button.active,

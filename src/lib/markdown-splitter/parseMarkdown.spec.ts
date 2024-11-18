@@ -358,4 +358,31 @@ describe("lineSpans", () => {
     ];
     expect(collected).toEqual(spansExpect(spans));
   });
+
+  it("Should treat --- delimited sections at the start of the document as metadata", () => {
+    const spans: testSpan[] = [
+      {
+        unparsed: "---\nfoo: bar\n---\n",
+        expectedType: SyntaxNodeType.Metadata,
+      },
+      {
+        unparsed: "text\n---\nfoo: bar\n---\nmetadata-like",
+        expectedType: SyntaxNodeType.Text,
+      },
+      {
+        unparsed: "%%a comment to divide the nodes%%",
+        expectedType: SyntaxNodeType.Comment,
+      },
+      {
+        unparsed: "\n---\nmetadata: like\n---\n",
+        expectedType: SyntaxNodeType.Text,
+      },
+    ];
+    const collected = [
+      ...parseMarkdown(spans.map((s) => s.unparsed).join(""), [
+        ...standardTransformers,
+      ]),
+    ];
+    expect(collected).toEqual(spansExpect(spans));
+  });
 });
