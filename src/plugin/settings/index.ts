@@ -2,6 +2,7 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import { CopySectionPlugin } from "..";
 
 export interface SectionCopyDisplaySettings {
+  displayTitle: boolean;
   displayH1: boolean;
   displayH2: boolean;
   displayH3: boolean;
@@ -26,6 +27,7 @@ export type SectionCopySettings = SectionCopyCaptureSettings &
   SectionCopyTweakSettings;
 
 export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
+  displayTitle: true,
   displayH1: true,
   displayH2: true,
   displayH3: true,
@@ -116,6 +118,19 @@ export class SettingTab extends PluginSettingTab {
       .setName("Section levels where the copy button should display")
       .setDesc("Note: a reload is required for these to take effect.")
       .setHeading();
+
+    new Setting(containerEl)
+      .setName(`Display on title`)
+      .setDesc(`Add a copy button to the title`)
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.displayTitle)
+          .onChange(async (value) => {
+            this.plugin.settings.displayTitle = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
     for (let level of [1, 2, 3, 4, 5, 6] as (1 | 2 | 3 | 4 | 5 | 6)[]) {
       new Setting(containerEl)
         .setName(`Display on section level ${level}`)

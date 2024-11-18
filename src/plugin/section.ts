@@ -1,6 +1,7 @@
 import { CachedMetadata } from "obsidian";
 import { CachedMetadataSlice } from "../lib/obsidian/cachedMedataSlice";
 import { CopySectionPlugin } from ".";
+import { SectionCopySettings } from "./settings";
 import { textTweaker } from "./util/textTweaker";
 import { StringSlicer, SliceStringer, sliceText } from "../lib/text";
 
@@ -8,7 +9,13 @@ export function sectionMarkdown(
   plugin: CopySectionPlugin,
   doc: StringSlicer | SliceStringer,
   offset: number,
+  settingOverrides?: Partial<SectionCopySettings>,
 ): string {
+  const settings: SectionCopySettings = Object.assign(
+    {},
+    plugin.settings,
+    settingOverrides || {},
+  );
   const file = plugin.app.workspace.activeEditor?.file;
   if (!file) {
     throw new Error("No active editor file");
@@ -28,13 +35,10 @@ export function sectionMarkdown(
   }
   const nextHeading = [...metadataSlice.getHeadings()]
     .slice(1)
-    .find(
-      (h) =>
-        plugin.settings.excludeSubsections || h.level <= firstHeading.level,
-    );
+    .find((h) => settings.excludeSubsections || h.level <= firstHeading.level);
 
   const sectionSlice = metadataSlice.sliceAbsolute(
-    !plugin.settings.includeSectionHeading && firstHeading
+    !settings.includeSectionHeading && firstHeading
       ? firstHeading.position.end.offset
       : undefined,
     nextHeading ? nextHeading.position.start.offset : undefined,
@@ -42,6 +46,6 @@ export function sectionMarkdown(
 
   return textTweaker(
     sliceText(doc, sectionSlice.from, sectionSlice.to),
-    plugin.settings,
+    settings,
   );
 }
