@@ -68,6 +68,10 @@ export function textTweaker(
       continue;
     }
 
+    if (settings.stripMetadata && span.type === SyntaxNodeType.Metadata) {
+      continue;
+    }
+
     line += spanText;
     if (newlineIndex !== -1) {
       if (

@@ -93,8 +93,21 @@ interface tweakSpansMatch {
 type tweakSpansRule = (
   text: string,
   offset: number,
+  nodeIndex: number,
 ) => tweakSpansMatch | undefined;
 const tweakSpansRules: tweakSpansRule[] = [
+  (text, offset, nodeIndex) => {
+    if (nodeIndex !== 0 || offset !== 0 || text.substring(0, 4) !== "---\n") {
+      return undefined; // only match at beginning of document
+    }
+
+    const end = text.indexOf("\n---\n", 3);
+    if (end === -1) {
+      return undefined;
+    }
+    console.log("from", 0, "to", end + 5, "::", text.substring(0, end + 5));
+    return { type: SyntaxNodeType.Metadata, from: 0, to: end + 5 };
+  },
   (text, offset) => {
     const start = text.indexOf("\\", offset);
     if (start === -1 || start === text.length - 1) {
@@ -175,7 +188,13 @@ function* tweakSpans(
    */
   let next: SyntaxNode | undefined;
   let node: SyntaxNode | undefined;
+  let i: number | undefined;
   for (node of spans) {
+    if (i === undefined) {
+      i = 0;
+    } else {
+      i++;
+    }
     if (
       state === tweakSpansState.Default &&
       node.type !== SyntaxNodeType.Text
@@ -214,7 +233,7 @@ function* tweakSpans(
     while (offset < text.length) {
       let matched: tweakSpansMatch | undefined;
       for (const rule of tweakSpansRules) {
-        const match = rule(text, offset);
+        const match = rule(text, offset, i);
         if (match && (!matched || matched.from > match.from)) {
           matched = match;
         }
@@ -284,7 +303,7 @@ export const standardTransformers: SyntaxNodeTransformer[] = [
     [SyntaxNodeType.Gap]: SyntaxNodeType.Text,
   }),
 
-  // Separate out Comments and Tags
+  // Separate out Comments, Metadata, and Tags
   tweakSpans,
 
   // Recombine runs of the same type, eg: multiple Comments, while removing distinction between "Literals" and "Text"

@@ -18,6 +18,7 @@ export interface SectionCopyCaptureSettings {
 
 export interface SectionCopyTweakSettings {
   stripComments: boolean;
+  stripMetadata: boolean;
   stripModifiedEmpty: boolean;
   stripTagLines: boolean;
 }
@@ -37,6 +38,7 @@ export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
   excludeSubsections: false,
   includeSectionHeading: true,
   stripComments: false,
+  stripMetadata: true,
   stripModifiedEmpty: true,
   stripTagLines: false,
 };
@@ -84,6 +86,17 @@ export class SettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.stripComments)
           .onChange(async (value) => {
             this.plugin.settings.stripComments = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+    new Setting(containerEl)
+      .setName("Strip metadata")
+      .setDesc("Remove metadata when copying whole files?")
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.stripMetadata)
+          .onChange(async (value) => {
+            this.plugin.settings.stripMetadata = value;
             await this.plugin.saveSettings();
           }),
       );
