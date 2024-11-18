@@ -1,8 +1,9 @@
-import { Plugin } from "obsidian";
+import { Plugin, MarkdownView } from "obsidian";
 import { StateField } from "@codemirror/state";
 import { copySectionEditorView } from "./editor-extension";
 import { copySectionReaderView } from "./markdown-post-processor";
 import { copySectionRegisterDomExtension } from "./dom-extension";
+import { copySectionCopyCommand, copySectionCopyRawCommand } from "./commands";
 import { SettingTab, SectionCopySettings, DEFAULT_SETTINGS } from "./settings";
 
 export class CopySectionPlugin extends Plugin {
@@ -10,6 +11,8 @@ export class CopySectionPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     this.addSettingTab(new SettingTab(this.app, this));
+    this.addCommand(copySectionCopyCommand(this.app, this));
+    this.addCommand(copySectionCopyRawCommand(this.app, this));
     this.registerEditorExtension([
       pluginField.init(() => this),
       copySectionEditorView,
