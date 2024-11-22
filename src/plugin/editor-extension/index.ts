@@ -19,9 +19,13 @@ class CopySectionWidget extends WidgetType {
     super();
   }
   toDOM(view: EditorView): HTMLElement {
+    const plugin = view.state.field(pluginField);
     const doc = view.state.doc;
     const container = document.createElement("span");
     container.addClass("plugin-copy-section-buttons");
+    if (plugin?.settings.displayAlways) {
+      container.addClass("plugin-copy-section-buttons-displayAlways");
+    }
     const copyButton = mkButton("copy", "copy", container);
 
     const debounce = { lock: false };
