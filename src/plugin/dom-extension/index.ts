@@ -33,6 +33,9 @@ export function copySectionRegisterDomExtension(
       }
       const container = title.createEl("span");
       container.addClass("plugin-copy-section-buttons");
+      if (plugin.settings.displayAlways) {
+        container.addClass("plugin-copy-section-buttons-displayAlways");
+      }
       const copyButton = mkButton("copy", "copy", container);
       const debounce = { lock: false };
       // just to make the "active" button style in reader view

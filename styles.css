@@ -28,6 +28,14 @@ h6 .plugin-copy-section-buttons {
     visibility: hidden;
 }
 
+.inline-title .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
+.HyperMD-header .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
+h1 .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
+h2 .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
+h3 .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
+h4 .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
+h5 .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
+h6 .plugin-copy-section-buttons.plugin-copy-section-buttons-displayAlways,
 .is-mobile .inline-title .plugin-copy-section-buttons,
 .is-mobile .HyperMD-header .plugin-copy-section-buttons,
 .is-mobile h1 .plugin-copy-section-buttons,
