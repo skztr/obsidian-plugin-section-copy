@@ -81,7 +81,9 @@ class CopySectionButtonsPlugin implements PluginValue {
     const tree = syntaxTree(view.state);
     const plugin = view.state.field(pluginField);
     const displayHeaders =
-      plugin?.displayLevels().map((l) => `header_header-${l}`) || [];
+      plugin
+        ?.displayLevels()
+        .map((l) => `HyperMD-header_HyperMD-header-${l}`) || [];
 
     for (let { from, to } of view.visibleRanges) {
       tree.iterate({
