@@ -105,7 +105,6 @@ const tweakSpansRules: tweakSpansRule[] = [
     if (end === -1) {
       return undefined;
     }
-    console.log("from", 0, "to", end + 5, "::", text.substring(0, end + 5));
     return { type: SyntaxNodeType.Metadata, from: 0, to: end + 5 };
   },
   (text, offset) => {
