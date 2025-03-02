@@ -63,6 +63,7 @@ export function copySectionRegisterDomExtension(
             const offset = 0;
             const sectionText = sectionMarkdown(plugin, view.data, offset, {
               excludeSubsections: false,
+              full: true,
             });
             await navigator.clipboard.writeText(sectionText);
           } catch (e) {

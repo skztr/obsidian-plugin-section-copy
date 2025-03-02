@@ -15,6 +15,7 @@ export function copySectionCopyCommand(
       if (activeView) {
         const sectionText = sectionMarkdown(plugin, activeView.data, 0, {
           excludeSubsections: false,
+          full: true,
         });
         navigator.clipboard.writeText(sectionText);
       }

@@ -5,13 +5,16 @@ import { SectionCopySettings } from "./settings";
 import { textTweaker } from "./util/textTweaker";
 import { StringSlicer, SliceStringer, sliceText } from "../lib/text";
 
+export type SectionMarkdownSettings = Partial<SectionCopySettings> & {
+  full?: boolean;
+};
 export function sectionMarkdown(
   plugin: CopySectionPlugin,
   doc: StringSlicer | SliceStringer,
   offset: number,
-  settingOverrides?: Partial<SectionCopySettings>,
+  settingOverrides?: SectionMarkdownSettings,
 ): string {
-  const settings: SectionCopySettings = Object.assign(
+  const settings: SectionMarkdownSettings = Object.assign(
     {},
     plugin.settings,
     settingOverrides || {},
@@ -28,17 +31,22 @@ export function sectionMarkdown(
 
   const metadataSlice = new CachedMetadataSlice(fileCache, offset);
   const firstHeading = metadataSlice.getHeadingRelative(0);
-  if (!firstHeading) {
+  if (!firstHeading && !settings.full) {
     throw new Error(
       "Specified section does not contain a Heading (none are cached)",
     );
   }
-  const nextHeading = [...metadataSlice.getHeadings()]
-    .slice(1)
-    .find((h) => settings.excludeSubsections || h.level <= firstHeading.level);
+  const nextHeading =
+    firstHeading && !settings.full
+      ? [...metadataSlice.getHeadings()]
+          .slice(1)
+          .find(
+            (h) => settings.excludeSubsections || h.level <= firstHeading.level,
+          )
+      : undefined;
 
   const sectionSlice = metadataSlice.sliceAbsolute(
-    !settings.includeSectionHeading && firstHeading
+    !settings.full && !settings.includeSectionHeading && firstHeading
       ? firstHeading.position.end.offset
       : undefined,
     nextHeading ? nextHeading.position.start.offset : undefined,
