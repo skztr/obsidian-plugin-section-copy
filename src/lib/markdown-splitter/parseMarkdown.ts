@@ -115,6 +115,39 @@ const tweakSpansRules: tweakSpansRule[] = [
     return { type: SyntaxNodeType.Literal, from: start, to: start + 2 };
   },
   (text, offset) => {
+    // wiki-style link [[link]] or [[link|alias]]
+    const start = text.indexOf("[[", offset);
+    if (start === -1) {
+      return undefined;
+    }
+    const end = text.indexOf("]]", start + 2);
+    return {
+      type: SyntaxNodeType.Link,
+      from: start,
+      to: end === -1 ? start + 2 : end + 2,
+    };
+  },
+  (text, offset) => {
+    // markdown-style link [text](url)
+    const start = text.indexOf("[", offset);
+    if (start === -1) {
+      return undefined;
+    }
+    const mid = text.indexOf("](", start + 1);
+    if (mid === -1) {
+      return undefined;
+    }
+    const end = text.indexOf(")", mid + 2);
+    if (end === -1) {
+      return undefined;
+    }
+    return {
+      type: SyntaxNodeType.Link,
+      from: start,
+      to: end + 1,
+    };
+  },
+  (text, offset) => {
     const start = text.indexOf("%%", offset);
     if (start === -1) {
       return undefined;
@@ -173,6 +206,7 @@ enum tweakSpansState {
  *  - escapes various things, eg: comment markers. Note it only escapes *beginning* comment markers.
  *    Obsidian itself is inconsistent about how *end* comment markers are escaped/not.
  *  - detects tags
+ *  - detects links (which are emitted by the parser as text)
  *
  *  You'll probably want to run combineSpans both before and after this step
  */

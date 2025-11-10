@@ -19,6 +19,7 @@ export interface SectionCopyCaptureSettings {
 
 export interface SectionCopyTweakSettings {
   stripComments: boolean;
+  stripLinks: boolean;
   stripMetadata: boolean;
   stripModifiedEmpty: boolean;
   stripTagLines: boolean;
@@ -40,6 +41,7 @@ export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
   excludeSubsections: false,
   includeSectionHeading: true,
   stripComments: false,
+  stripLinks: false,
   stripMetadata: true,
   stripModifiedEmpty: true,
   stripTagLines: false,
@@ -88,6 +90,17 @@ export class SettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.stripComments)
           .onChange(async (value) => {
             this.plugin.settings.stripComments = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+    new Setting(containerEl)
+      .setName("Strip links")
+      .setDesc("Remove link-related markdown when copying section data?")
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.stripLinks)
+          .onChange(async (value) => {
+            this.plugin.settings.stripLinks = value;
             await this.plugin.saveSettings();
           }),
       );

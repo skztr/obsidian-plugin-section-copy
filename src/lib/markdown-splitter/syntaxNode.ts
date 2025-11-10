@@ -5,6 +5,7 @@ import { SyntaxNodePosition } from "./syntaxNodePosition";
 export enum SyntaxNodeType {
   Comment = "comment",
   Gap = "gap",
+  Link = "link",
   Literal = "literal",
   Metadata = "metadata",
   Tag = "tag",

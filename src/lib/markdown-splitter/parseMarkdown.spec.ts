@@ -385,4 +385,23 @@ describe("lineSpans", () => {
     ];
     expect(collected).toEqual(spansExpect(spans));
   });
+
+  it("Should treat various [[markdown]] [links](markdown) as links", () => {
+    const spans: testSpan[] = [
+      { unparsed: "leading " },
+      { unparsed: "[[wikilink]]", expectedType: SyntaxNodeType.Link },
+      { unparsed: " middle " },
+      {
+        unparsed: "[markdown link](http://example.com)",
+        expectedType: SyntaxNodeType.Link,
+      },
+      { unparsed: " trailing" },
+    ];
+    const collected = [
+      ...parseMarkdown(spans.map((s) => s.unparsed).join(""), [
+        ...standardTransformers,
+      ]),
+    ];
+    expect(collected).toEqual(spansExpect(spans));
+  });
 });

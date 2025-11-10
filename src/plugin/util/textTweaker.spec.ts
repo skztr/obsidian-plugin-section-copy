@@ -300,4 +300,58 @@ describe("textTweaker", () => {
       }),
     ).toEqual(expectedComment);
   });
+
+  it("should remove wikilinks on request", () => {
+    const original = unindent(`This is a [[link]] in a line.`);
+    const expected = unindent(`This is a link in a line.`);
+    expect(textTweaker(original, { stripLinks: true })).toEqual(expected);
+  });
+
+  it("should remove wikilinks with aliases on request", () => {
+    const original = unindent(`This is a [[link|alias]] in a line.`);
+    const expected = unindent(`This is a alias in a line.`);
+    expect(textTweaker(original, { stripLinks: true })).toEqual(expected);
+  });
+
+  it("should remove wikilinks with nested pipes on request", () => {
+    const original = unindent(
+      `This is a [[link|alias with | pipe]] in a line.`,
+    );
+    const expected = unindent(`This is a alias with | pipe in a line.`);
+    expect(textTweaker(original, { stripLinks: true })).toEqual(expected);
+  });
+
+  it("should remove multiple wikilinks on request", () => {
+    const original = unindent(
+      `This is a [[link1]] and another [[link2|alias2]] in a line.`,
+    );
+    const expected = unindent(`This is a link1 and another alias2 in a line.`);
+    expect(textTweaker(original, { stripLinks: true })).toEqual(expected);
+  });
+
+  it("should remove markdown links on request", () => {
+    const original = unindent(
+      `This is a [link text](https://example.com/some/page) in a line.`,
+    );
+    const expected = unindent(`This is a link text in a line.`);
+    expect(textTweaker(original, { stripLinks: true })).toEqual(expected);
+  });
+
+  it("should remove multiple markdown links on request", () => {
+    const original = unindent(
+      `This is a [link1](https://example.com/1) and another [link2](https://example.com/2) in a line.`,
+    );
+    const expected = unindent(`This is a link1 and another link2 in a line.`);
+    expect(textTweaker(original, { stripLinks: true })).toEqual(expected);
+  });
+
+  it("should remove all link types on request", () => {
+    const original = unindent(
+      `This is a [[link1]] and a [[link2|alias2]] and a [link3](https://example.com/3) in a line.`,
+    );
+    const expected = unindent(
+      `This is a link1 and a alias2 and a link3 in a line.`,
+    );
+    expect(textTweaker(original, { stripLinks: true })).toEqual(expected);
+  });
 });
