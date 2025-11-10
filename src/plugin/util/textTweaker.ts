@@ -18,7 +18,7 @@ export function textTweaker(
   text: string,
   settings: Partial<SectionCopyTweakSettings>,
 ): string {
-  if (!settings.stripComments && !settings.stripTagLines) {
+  if (!settings.stripComments && !settings.stripMetadata && !settings.stripTagLines) {
     return text;
   }
 
