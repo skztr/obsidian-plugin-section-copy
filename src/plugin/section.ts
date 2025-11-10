@@ -25,7 +25,7 @@ export function sectionMarkdown(
   }
   const fileCache: CachedMetadata | null =
     plugin.app.metadataCache.getFileCache(file);
-  if (!fileCache?.headings || !fileCache?.sections) {
+  if (!fileCache?.sections) {
     throw new Error("fileCache not ready");
   }
 
