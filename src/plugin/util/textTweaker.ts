@@ -18,7 +18,12 @@ export function textTweaker(
   text: string,
   settings: Partial<SectionCopyTweakSettings>,
 ): string {
-  if (!settings.stripComments && !settings.stripTagLines) {
+  if (
+    !settings.stripComments &&
+    !settings.stripLinks &&
+    !settings.stripMetadata &&
+    !settings.stripTagLines
+  ) {
     return text;
   }
 
@@ -55,6 +60,29 @@ export function textTweaker(
     ) {
       // we care whether the current "line" has any non-whitespace characters in spans that won't be stripped
       hasNonWhitespace = true;
+    }
+
+    if (settings.stripLinks && span.type === SyntaxNodeType.Link) {
+      const isWikiLink = spanText.startsWith("[[") && spanText.endsWith("]]");
+      const isMarkdownLink =
+        !isWikiLink &&
+        spanText.startsWith("[") &&
+        spanText.includes("](") &&
+        spanText.endsWith(")");
+      if (isWikiLink) {
+        const [_, linkText, linkAlias] =
+          spanText.match(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/) ?? [];
+        line += linkAlias || linkText;
+        continue;
+      }
+      if (isMarkdownLink) {
+        const linkText = spanText.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1");
+        line += linkText;
+        continue;
+      }
+      // not a link we recognize, just add the text as-is
+      line += spanText;
+      continue;
     }
 
     if (settings.stripComments && span.type === SyntaxNodeType.Comment) {
