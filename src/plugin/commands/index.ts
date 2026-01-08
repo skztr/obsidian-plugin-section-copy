@@ -84,11 +84,14 @@ export function copySectionCopyCurrentCommand(
         }
       }
 
+      const displayLevels = plugin.displayLevels();
+      const cursorInDisplayedHeading =
+        targetHeading &&
+        displayLevels.includes(targetHeading.level as 1 | 2 | 3 | 4 | 5 | 6);
+
       // If we found a heading, check if it would have a copy button
       // If not, walk up to parent headings until we find one that would
       if (targetHeading) {
-        const displayLevels = plugin.displayLevels();
-
         // Find the closest parent heading that has a copy button
         while (
           targetHeading &&
@@ -116,7 +119,9 @@ export function copySectionCopyCurrentCommand(
       const full = !targetHeading;
 
       const sectionText = sectionMarkdown(plugin, activeView.data, offset, {
-        excludeSubsections: plugin.settings.excludeSubsections,
+        excludeSubsections: cursorInDisplayedHeading
+          ? plugin.settings.excludeSubsections
+          : false,
         full: full,
       });
       navigator.clipboard.writeText(sectionText);
