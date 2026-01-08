@@ -2,6 +2,7 @@ import { App, MarkdownView } from "obsidian";
 import { mkButton } from "../button";
 import { CopySectionPlugin } from "..";
 import { sectionMarkdown } from "../section";
+import { detectViewMode, ViewMode } from "../util/viewMode";
 
 export function copySectionRegisterDomExtension(
   app: App,
@@ -22,6 +23,20 @@ export function copySectionRegisterDomExtension(
       if (!view.data) {
         return false;
       }
+
+      const viewMode = detectViewMode(view);
+
+      if (
+        (viewMode === ViewMode.ReadingMode &&
+          !plugin.settings.displayInReadingMode) ||
+        (viewMode === ViewMode.LivePreview &&
+          !plugin.settings.displayInLivePreview) ||
+        (viewMode === ViewMode.SourceMode &&
+          !plugin.settings.displayInSourceMode)
+      ) {
+        return true;
+      }
+
       if (readinessCheck) {
         clearInterval(readinessCheck);
         readinessCheck = undefined;

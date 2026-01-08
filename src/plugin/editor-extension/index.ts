@@ -13,6 +13,7 @@ import {
 import { mkButton } from "../button";
 import { pluginField } from "..";
 import { sectionMarkdown } from "../section";
+import { ViewMode } from "../util/viewMode";
 
 class CopySectionWidget extends WidgetType {
   constructor(private startPos: number) {
@@ -80,6 +81,26 @@ class CopySectionButtonsPlugin implements PluginValue {
     const builder = new RangeSetBuilder<Decoration>();
     const tree = syntaxTree(view.state);
     const plugin = view.state.field(pluginField);
+
+    if (!plugin) {
+      return builder.finish();
+    }
+
+    // Check if we're in live preview by looking for the markdown-source-view container
+    // Live preview has the is-live-preview class, source mode doesn't
+    const markdownSourceView = view.dom.closest(".markdown-source-view");
+    const isLivePreview =
+      markdownSourceView?.classList.contains("is-live-preview") ?? false;
+    const viewMode = isLivePreview ? ViewMode.LivePreview : ViewMode.SourceMode;
+
+    if (
+      (viewMode === ViewMode.LivePreview &&
+        !plugin.settings.displayInLivePreview) ||
+      (viewMode === ViewMode.SourceMode && !plugin.settings.displayInSourceMode)
+    ) {
+      return builder.finish();
+    }
+
     const displayHeaders =
       plugin
         ?.displayLevels()

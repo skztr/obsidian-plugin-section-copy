@@ -10,6 +10,9 @@ export interface SectionCopyDisplaySettings {
   displayH4: boolean;
   displayH5: boolean;
   displayH6: boolean;
+  displayInLivePreview: boolean;
+  displayInSourceMode: boolean;
+  displayInReadingMode: boolean;
 }
 
 export interface SectionCopyCaptureSettings {
@@ -38,6 +41,9 @@ export const DEFAULT_SETTINGS: Partial<SectionCopySettings> = {
   displayH4: true,
   displayH5: true,
   displayH6: true,
+  displayInLivePreview: true,
+  displayInSourceMode: true,
+  displayInReadingMode: true,
   excludeSubsections: false,
   includeSectionHeading: true,
   stripComments: false,
@@ -155,6 +161,42 @@ export class SettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.displayAlways)
           .onChange(async (value) => {
             this.plugin.settings.displayAlways = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName(`Display in Live Preview`)
+      .setDesc(`Show copy buttons in Live Preview mode`)
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.displayInLivePreview)
+          .onChange(async (value) => {
+            this.plugin.settings.displayInLivePreview = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName(`Display in Source Mode`)
+      .setDesc(`Show copy buttons in Source Mode`)
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.displayInSourceMode)
+          .onChange(async (value) => {
+            this.plugin.settings.displayInSourceMode = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName(`Display in Reading Mode`)
+      .setDesc(`Show copy buttons in Reading Mode`)
+      .addToggle((toggle: ToggleComponent) =>
+        toggle
+          .setValue(this.plugin.settings.displayInReadingMode)
+          .onChange(async (value) => {
+            this.plugin.settings.displayInReadingMode = value;
             await this.plugin.saveSettings();
           }),
       );

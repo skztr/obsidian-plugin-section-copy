@@ -15,6 +15,10 @@ export function copySectionReaderView(
     el: HTMLElement,
     ctx: MarkdownPostProcessorContext,
   ): Promise<void> => {
+    if (!plugin.settings.displayInReadingMode) {
+      return;
+    }
+
     const elSectionInfo = ctx.getSectionInfo(el);
     if (!elSectionInfo) {
       return;
