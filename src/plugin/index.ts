@@ -3,7 +3,11 @@ import { StateField } from "@codemirror/state";
 import { copySectionEditorView } from "./editor-extension";
 import { copySectionReaderView } from "./markdown-post-processor";
 import { copySectionRegisterDomExtension } from "./dom-extension";
-import { copySectionCopyCommand, copySectionCopyRawCommand } from "./commands";
+import {
+  copySectionCopyCommand,
+  copySectionCopyRawCommand,
+  copySectionCopyCurrentCommand,
+} from "./commands";
 import { SettingTab, SectionCopySettings, DEFAULT_SETTINGS } from "./settings";
 
 export class CopySectionPlugin extends Plugin {
@@ -13,6 +17,7 @@ export class CopySectionPlugin extends Plugin {
     this.addSettingTab(new SettingTab(this.app, this));
     this.addCommand(copySectionCopyCommand(this.app, this));
     this.addCommand(copySectionCopyRawCommand(this.app, this));
+    this.addCommand(copySectionCopyCurrentCommand(this.app, this));
     this.registerEditorExtension([
       pluginField.init(() => this),
       copySectionEditorView,
