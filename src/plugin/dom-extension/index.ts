@@ -60,11 +60,20 @@ export function copySectionRegisterDomExtension(
           }
           try {
             debounce.lock = true;
+            const currentView = app.workspace.getActiveViewOfType(MarkdownView);
+            if (!currentView) {
+              return;
+            }
             const offset = 0;
-            const sectionText = sectionMarkdown(plugin, view.data, offset, {
-              excludeSubsections: false,
-              full: true,
-            });
+            const sectionText = sectionMarkdown(
+              plugin,
+              currentView.data,
+              offset,
+              {
+                excludeSubsections: false,
+                full: true,
+              },
+            );
             await navigator.clipboard.writeText(sectionText);
           } catch (e) {
             // ignore it, probably nothing, right?
