@@ -7,8 +7,7 @@ export function copySectionRegisterDomExtension(
   app: App,
   plugin: CopySectionPlugin,
 ) {
-  let readinessCheck: NodeJS.Timeout | undefined;
-  app.workspace.on("active-leaf-change", (leaf) => {
+  const initializeLeaf = (leaf: any) => {
     if (
       !plugin.settings.displayTitle ||
       !leaf ||
@@ -18,6 +17,7 @@ export function copySectionRegisterDomExtension(
     }
 
     const view = leaf.view as MarkdownView;
+    let readinessCheck: NodeJS.Timeout | undefined;
     const callback = (): boolean => {
       if (!view.data) {
         return false;
@@ -27,7 +27,7 @@ export function copySectionRegisterDomExtension(
         readinessCheck = undefined;
       }
 
-      const title = document.querySelector(".inline-title");
+      const title = leaf.view.containerEl.querySelector(".inline-title");
       if (!title || title.querySelector(".plugin-copy-section-buttons")) {
         return true;
       }
@@ -86,7 +86,17 @@ export function copySectionRegisterDomExtension(
       return true;
     };
     if (!callback()) {
-      setInterval(callback, 200);
+      readinessCheck = setInterval(callback, 200);
     }
+  };
+
+  // Initialize all existing leaves when the plugin loads
+  app.workspace.iterateAllLeaves((leaf) => {
+    initializeLeaf(leaf);
+  });
+
+  // Listen for new tabs or tab switches
+  app.workspace.on("active-leaf-change", (leaf) => {
+    initializeLeaf(leaf);
   });
 }
